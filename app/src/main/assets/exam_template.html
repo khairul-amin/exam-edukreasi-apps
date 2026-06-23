@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ujian Offline</title>
+    <style>
+        body { background: #f8fafc; padding-bottom: 90px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; }
+        .header-bar { background: #1e293b; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .timer-box { background: #dc2626; padding: 5px 15px; border-radius: 8px; font-weight: bold; font-family: monospace; font-size: 18px; }
+        .exam-container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
+        .question-card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); min-height: 250px; }
+        .q-number-badge { background: #3b82f6; color: white; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; margin-bottom: 15px; display: inline-block; }
+        .question-text { font-size: 19px; color: #1e293b; line-height: 1.6; margin-bottom: 25px; }
+        
+        .question-text img, .option-text img { 
+            max-width: 100% !important; 
+            height: auto !important; 
+            display: block; 
+            margin: 10px 0;
+            border-radius: 8px; 
+        }
+        
+        .option-item { border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; padding: 16px 20px; display: flex; align-items: center; cursor: pointer; transition: 0.2s; }
+        .option-item.selected { border-color: #3b82f6; background: #eff6ff; }
+        .option-label { width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; font-size: 14px; flex-shrink: 0; }
+        .option-item.selected .option-label { background: #3b82f6; color: white; }
+        .option-text { flex: 1; font-size: 16px; }
+        
+        .nav-footer { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; }
+        .btn { padding: 12px 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-prev { background: #f1f5f9; color: #64748b; }
+        .btn-next { background: #3b82f6; color: white; }
+        .btn-submit { background: #10b981; color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        #palette-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .palette-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; padding: 25px; max-height: 80vh; overflow-y: auto; }
+        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
+        .q-item { aspect-ratio: 1; border: 2px solid #e2e8f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; }
+        .q-item.answered { background: #10b981; border-color: #10b981; color: white; }
+        .q-item.current { border-color: #3b82f6; color: #3b82f6; border-width: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="header-bar">
+    <div id="subject-title" style="font-weight: bold;">Ujian</div>
+    <div class="timer-box" id="timer">00:00:00</div>
+</div>
+
+<div class="exam-container">
+    <div class="question-card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <span class="q-number-badge" id="q-number">Soal 1</span>
+        </div>
+        <div class="question-text" id="q-text">Sedang memuat soal...</div>
+        <div class="options-list" id="q-options"></div>
+    </div>
+</div>
+
+<div class="nav-footer">
+    <button class="btn btn-prev" id="btn-prev" onclick="changeQuestion(-1)">Kembali</button>
+    <button class="btn" style="background:#1e293b; color:white; padding: 12px 15px;" onclick="togglePalette()">📑</button>
+    <button class="btn btn-next" id="btn-next" onclick="changeQuestion(1)">Lanjut</button>
+    <button class="btn btn-submit" id="btn-submit" style="display:none;" onclick="finishExam()">Selesai</button>
+</div>
+
+<div id="palette-modal" onclick="togglePalette()">
+    <div class="palette-content" onclick="event.stopPropagation()">
+        <h3 style="margin:0;">Navigasi Soal</h3>
+        <div class="palette-grid" id="palette-grid"></div>
+        <button class="btn btn-next" style="width:100%; margin-top:20px;" onclick="togglePalette()">Tutup</button>
+    </div>
+</div>
+
+<script>
+    let examData = { questions: [], durationMinutes: 60, name: "Ujian" };
+    let currentIndex = 0;
+    let studentAnswers = {};
+    let timeLeft = 0;
+    let timerInterval = null;
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function updateExamData(data) {
+        try {
+            if (!data.questions || data.questions.length === 0) {
+                document.getElementById('q-text').innerText = "Tidak ada soal untuk ujian ini.";
+                return;
+            }
+
+            shuffle(data.questions);
+            data.questions.forEach(q => {
+                if (q.options && !q.originalOptions) {
+                    q.originalOptions = q.options.map((opt, idx) => ({ text: opt, originalIdx: idx }));
+                    shuffle(q.originalOptions);
+                }
+            });
+            
+            examData = data;
+            document.getElementById('subject-title').innerText = data.name || data.judul || "Ujian";
+            
+            if (window.Android) {
+                try {
+                    const saved = JSON.parse(Android.getSavedAnswers());
+                    if (saved && typeof saved === 'object') {
+                        studentAnswers = saved;
+                    }
+                } catch (e) { console.log("Restore error:", e); }
+            }
+
+            // MODIFIKASI: Kirim durasi total saat mengecek cache
+            let savedTime = -1;
+            const totalDur = data.durationMinutes || 60;
+            if (window.Android) {
+                savedTime = Android.getRemainingTime(totalDur);
+            }
+
+            if (savedTime > 0) {
+                timeLeft = savedTime;
+            } else {
+                timeLeft = totalDur * 60;
+            }
+
+            startTimer();
+            renderQuestion(true); 
+        } catch (e) { 
+            document.getElementById('q-text').innerText = "Error: " + e.message; 
+        }
+    }
+
+    window.onload = function() {
+        if (window.Android) {
+            try {
+                const dataStr = Android.getExamData();
+                if (dataStr && dataStr !== "{}" && dataStr !== "") {
+                    const parsed = JSON.parse(dataStr);
+                    if (parsed.questions && Array.isArray(parsed.questions)) {
+                        updateExamData(parsed);
+                    } else if (parsed.data && parsed.data.questions) {
+                        updateExamData({
+                            name: parsed.name || parsed.judul,
+                            questions: parsed.data.questions,
+                            durationMinutes: parsed.durationMinutes || parsed.data.durationMinutes || 60
+                        });
+                    }
+                }
+            } catch (e) { 
+                document.getElementById('q-text').innerText = "Gagal memuat data ujian."; 
+            }
+        }
+    };
+
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        const timerLabel = document.getElementById('timer');
+        const totalDur = examData.durationMinutes || 60;
+        
+        timerInterval = setInterval(() => {
+            if (timeLeft <= 0) { 
+                clearInterval(timerInterval); 
+                finishExam(true); 
+                return; 
+            }
+            timeLeft--;
+            
+            // MODIFIKASI: Kirim sisa waktu + durasi total untuk validasi cache
+            if (timeLeft % 5 === 0 && window.Android) {
+                Android.saveRemainingTime(timeLeft, totalDur);
+            }
+
+            const h = Math.floor(timeLeft / 3600).toString().padStart(2, '0');
+            const m = Math.floor((timeLeft % 3600) / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            timerLabel.innerText = `${h}:${m}:${s}`;
+        }, 1000);
+    }
+
+    function renderQuestion(shouldScroll = false) {
+        if (!examData.questions || examData.questions.length === 0) return;
+        
+        const q = examData.questions[currentIndex];
+        if (!q) return;
+
+        document.getElementById('q-number').innerText = `Soal ${currentIndex + 1}`;
+        document.getElementById('q-text').innerHTML = q.text || "";
+
+        const container = document.getElementById('q-options');
+        container.innerHTML = '';
+        
+        const displayOptions = q.originalOptions || (q.options || []).map((opt, idx) => ({ text: opt, originalIdx: idx }));
+
+        displayOptions.forEach((opt, idx) => {
+            const item = document.createElement('div');
+            item.className = 'option-item' + (studentAnswers[q.id] === opt.originalIdx ? ' selected' : '');
+            
+            item.onclick = () => { 
+                studentAnswers[q.id] = opt.originalIdx;
+                if (window.Android) {
+                    Android.saveAnswer(q.id, opt.originalIdx, false);
+                }
+                renderQuestion(false);
+            };
+            
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'option-label';
+            labelDiv.innerText = String.fromCharCode(65 + idx);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'option-text';
+            textDiv.innerHTML = typeof opt.text === 'object' ? (opt.text.text || opt.text.value || "") : opt.text;
+            
+            item.appendChild(labelDiv);
+            item.appendChild(textDiv);
+            container.appendChild(item);
+        });
+
+        document.getElementById('btn-prev').disabled = currentIndex === 0;
+        const isLast = currentIndex === examData.questions.length - 1;
+        document.getElementById('btn-next').style.display = isLast ? 'none' : 'block';
+        document.getElementById('btn-submit').style.display = isLast ? 'block' : 'none';
+
+        if (shouldScroll) {
+            window.scrollTo(0, 0);
+        }
+    }
+
+    function changeQuestion(dir) { 
+        if (currentIndex + dir >= 0 && currentIndex + dir < examData.questions.length) {
+            currentIndex += dir; 
+            renderQuestion(true);
+        }
+    }
+
+    function togglePalette() {
+        const modal = document.getElementById('palette-modal');
+        modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        if (modal.style.display === 'flex') {
+            const grid = document.getElementById('palette-grid');
+            grid.innerHTML = '';
+            examData.questions.forEach((q, i) => {
+                const item = document.createElement('div');
+                item.className = 'q-item';
+                if (studentAnswers[q.id] !== undefined) item.classList.add('answered');
+                if (i === currentIndex) item.classList.add('current');
+                item.innerText = i + 1;
+                item.onclick = () => { currentIndex = i; renderQuestion(true); togglePalette(); };
+                grid.appendChild(item);
+            });
+        }
+    }
+
+    function finishExam(isAuto = false) {
+        let unansweredCount = 0;
+        let firstUnanswered = -1;
+        
+        examData.questions.forEach((q, idx) => {
+            if (studentAnswers[q.id] === undefined) {
+                unansweredCount++;
+                if (firstUnanswered === -1) firstUnanswered = idx;
+            }
+        });
+
+        if (unansweredCount > 0 && !isAuto) {
+            alert("Ada " + unansweredCount + " soal yang belum dijawab. Silakan lengkapi terlebih dahulu.");
+            if (firstUnanswered !== -1) {
+                currentIndex = firstUnanswered;
+                renderQuestion(true);
+            }
+            return;
+        }
+
+        if (isAuto || confirm("Selesaikan ujian sekarang?")) {
+            if (window.Android) {
+                Android.submitExam(0.0, JSON.stringify({
+                    answers: studentAnswers
+                }));
+            }
+        }
+    }
+</script>
+</body>
+</html>

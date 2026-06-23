@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/navy"
+    android:fitsSystemWindows="true">
+
+    <!-- Header Responsif - SAMA DENGAN WebViewActivity -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
+        android:background="@color/navy"
+        android:paddingStart="12dp"
+        android:paddingEnd="4dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp">
+
+        <!-- Info Waktu dan Baterai -->
+        <LinearLayout
+            android:id="@+id/time_battery_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/time_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                tools:text="00:00:00" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:id="@+id/battery"
+                    android:layout_width="14dp"
+                    android:layout_height="9dp"
+                    android:layout_marginEnd="3dp"
+                    android:src="@drawable/baterai"
+                    app:tint="@android:color/white"
+                    android:importantForAccessibility="no" />
+
+                <TextView
+                    android:id="@+id/battery_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="10sp"
+                    android:alpha="0.85"
+                    tools:text="100%" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Logo -->
+        <ImageView
+            android:id="@+id/logo_image"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/logo"
+            android:contentDescription="Logo Aplikasi"
+            app:layout_constraintStart_toEndOf="@id/time_battery_layout"
+            app:layout_constraintEnd_toStartOf="@id/button_container"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Indikator Sync -->
+        <ImageView
+            android:id="@+id/iv_sync_indicator"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/stat_notify_sync"
+            android:visibility="gone"
+            app:tint="@android:color/white"
+            app:layout_constraintEnd_toStartOf="@id/button_container"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:importantForAccessibility="no" />
+
+        <!-- Tombol Aksi -->
+        <LinearLayout
+            android:id="@+id/button_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageButton
+                android:id="@+id/reload_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerInside"
+                android:padding="14dp"
+                android:src="@drawable/reload"
+                app:tint="@android:color/white"
+                android:contentDescription="Muat ulang halaman" />
+
+            <ImageButton
+                android:id="@+id/logout_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/logout"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerInside"
+                android:padding="14dp"
+                app:tint="@android:color/white"
+                android:contentDescription="Keluar aplikasi" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Content Area -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#F8FAFC">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="32dp">
+
+                <!-- Student Info Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardBackgroundColor="@color/navy"
+                    app:strokeWidth="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="24dp"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp">
+
+                        <TextView
+                            android:id="@+id/tv_student_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-black"
+                            android:text="Nama Siswa"
+                            android:textColor="#FFFFFF"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/tv_student_info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="NISN: 000000 | Kelas: XII-IPA"
+                            android:textColor="#E3F2FD"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- INFO SINKRONISASI -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/sync_status_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:visibility="gone"
+                    app:cardCornerRadius="12dp"
+                    app:cardBackgroundColor="#FFF7ED"
+                    app:strokeColor="#FED7AA"
+                    app:strokeWidth="1dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="12dp"
+                        android:gravity="center_vertical">
+                        <ProgressBar
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:indeterminateTint="#F97316"/>
+                        <TextView
+                            android:id="@+id/tv_sync_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="Mengirim 3 data ke server..."
+                            android:textColor="#9A3412"
+                            android:textSize="12sp"
+                            android:textStyle="bold"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/tv_section_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Jadwal Ujian"
+                        android:textColor="#1E293B"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_exams"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_offline_exam" />
+
+                <TextView
+                    android:id="@+id/tv_empty_state"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="64dp"
+                    android:gravity="center"
+                    android:text="Tidak ada jadwal tersedia hari ini."
+                    android:textColor="#64748B"
+                    android:visibility="gone" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- FAB Sync Manual-->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:text="Sinkron Ulang"
+        android:textColor="#FFFFFF"
+        app:backgroundTint="#10B981"
+        app:icon="@android:drawable/stat_notify_sync"
+        app:iconTint="#FFFFFF" />
+
+</LinearLayout>

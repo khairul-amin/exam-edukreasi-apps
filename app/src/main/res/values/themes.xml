@@ -1,0 +1,18 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Tema default untuk aplikasi -->
+    <style name="Theme.Exambro" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/navy</item>
+        <item name="colorPrimaryDark">@color/navy</item>
+        <item name="colorAccent">@color/teal_200</item>
+    </style>
+
+    <!-- Tema khusus untuk SplashScreen, WaitingScreen, dan WebView -->
+    <style name="Theme.SplashScreen" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <!-- Mengganti Fullscreen dengan status bar transparan agar notch aman -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/navy</item>
+        <item name="colorPrimary">@color/navy</item>
+        <item name="colorAccent">@color/teal_200</item>
+    </style>
+</resources>

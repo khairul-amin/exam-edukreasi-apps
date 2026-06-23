@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Exam Edu Kreasi</string>
+    <string name="exam_2024_2025">Exam 2024/2025</string>
+    <string name="start_exam">Cek Aplikasi</string>
+    <string name="exam_notification">Pastikan Anda sudah siap untuk memulai ujian. Jika sudah Memasuki Ujian tidak di perkenankan membuka aplikasi lain!!</string>
+    <string name="reload">Reload</string>
+    <string name="logout">Keluar</string>
+    <string name="link_not_valid">Link ujian tidak valid!</string>
+    <string name="password_incorrect">Password Salah!</string>
+    <string name="check_app_button_text">Cek Aplikasi</string>
+    <string name="start_exam_button">Lanjutkan Ujian</string>
+    <string name="start_exam_button_text">Mulai Ujian</string>
+    <string name="logout_button_description">Logout</string>
+    <string name="back_button_description">Kembali</string>
+    <string name="reload_description">Reload page</string>
+    <string name="Line">|</string>
+    <string name="open_wifi_settings">Buka Pengaturan WiFi</string>
+    <string name="internet_unavailable">Internet Tidak Tersedia.</string>
+    <string name="loading">Memuat, Harap Tunggu,,,</string>
+    <string name="navigation_drawer_open">Buka menu</string>
+    <string name="navigation_drawer_close">Tutup menu</string>
+
+    <!-- Google Sign-In Web Client ID -->
+    <string name="default_web_client_id">38256340987-ldve0qg1r7vsv70l91bs0uop64p9nqdc.apps.googleusercontent.com</string>
+</resources>

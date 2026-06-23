@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"> <!-- Background putih bersih -->
+
+    <!-- ========================================== -->
+    <!-- KONTEN TENGAH (Logo, Judul, Subtitle)      -->
+    <!-- ========================================== -->
+
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:contentDescription="Logo Aplikasi"
+        android:src="@drawable/logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.35" /> <!-- Posisi agak naik ke atas sedikit (Golden Ratio) -->
+
+    <!-- Judul Aplikasi (Dibuat Bold dan Kapital seperti desain "SECURITY") -->
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="sans-serif-black"
+        android:letterSpacing="0.02"
+        android:text="@string/app_name"
+        android:textAllCaps="true"
+        android:textColor="#0F172A"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/logo" />
+
+    <!-- Subtitle (Lebih kecil dan warna lebih redup) -->
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.03"
+        android:text="Aplikasi Ujian Aman untuk Sekolah"
+        android:textColor="#64748B"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text" />
+
+    <!-- ========================================== -->
+    <!-- AKSEN BAWAH & VERSI APLIKASI               -->
+    <!-- ========================================== -->
+
+    <!-- Aksen Lengkungan Biru di Bawah (Diambil dari drawable oval) -->
+    <!-- Ditulis lebih dulu agar berada di bawah teks secara visual (Z-index lebih rendah) -->
+
+    <!-- Teks Versi Aplikasi -->
+    <!-- Ditulis setelah lengkungan dan diberi elevation agar pasti menimpa lengkungan biru -->
+    <View
+        android:id="@+id/bottom_curve"
+        android:layout_width="600dp"
+        android:layout_height="250dp"
+        android:layout_marginBottom="-150dp"
+        android:background="@drawable/bg_bottom_curve"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.444"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/version_text"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/version_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:elevation="2dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

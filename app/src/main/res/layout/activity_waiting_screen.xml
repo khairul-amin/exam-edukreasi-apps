@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F8FAFC">
+
+        <!-- HEADER MODERN (Warna Biru) -->
+        <View
+            android:id="@+id/header_bg"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="#1E88E5"
+            app:layout_constraintHeight_percent="0.30"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Dekorasi Latar Header -->
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@android:drawable/ic_menu_gallery"
+            app:tint="#33FFFFFF"
+            android:layout_marginEnd="-20dp"
+            android:layout_marginTop="-20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Toolbar Transparan -->
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:elevation="0dp"
+            android:background="@android:color/transparent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:titleTextColor="@android:color/white"
+                app:navigationIconTint="@android:color/white" />
+        </com.google.android.material.appbar.AppBarLayout>
+
+
+        <!-- Header Section -->
+        <TextView
+            android:id="@+id/tv_greeting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Halo, Selamat Datang!"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
+
+        <!-- NAMA SEKOLAH -->
+        <TextView
+            android:id="@+id/tv_school_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="2dp"
+            android:fontFamily="sans-serif-black"
+            android:text=""
+            android:textColor="#FBFBFB"
+            android:textSize="22sp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_greeting" />
+
+        <TextView
+            android:id="@+id/tv_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="4dp"
+            android:text="Siap untuk menempuh ujian hari ini?"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/tv_school_name"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Area Konten -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            android:clipToPadding="false"
+            app:layout_constraintTop_toBottomOf="@id/tv_subtitle"
+            app:layout_constraintBottom_toTopOf="@id/bottom_action_container">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:paddingBottom="32dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/warning_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:strokeWidth="0dp"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="20dp">
+
+                        <ImageView
+                            android:id="@+id/illustration_image"
+                            android:layout_width="140dp"
+                            android:layout_height="150dp"
+                            android:src="@drawable/image"
+                            android:scaleType="centerCrop" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="GOOD LUCK!"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="#1E88E5"
+                            android:fontFamily="sans-serif-black"
+                            android:layout_marginTop="8dp"/>
+
+                        <TextView
+                            android:id="@+id/text_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="@string/exam_notification"
+                            android:textColor="#475569"
+                            android:textSize="14sp"
+                            android:textAlignment="center"
+                            android:lineSpacingExtra="4dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:id="@+id/status_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:textColor="#EF4444"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/warning_card" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+
+        <!-- Area Menu Grid -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bottom_action_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="32dp"
+            android:paddingTop="16dp"
+            android:backgroundTint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <View
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:background="#E2E8F0"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="-8dp"/>
+
+            <androidx.constraintlayout.helper.widget.Flow
+                android:id="@+id/menu_grid_flow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:constraint_referenced_ids="start_button,scan_qr_button,retry_button,exit_button"
+                app:flow_wrapMode="chain"
+                app:flow_maxElementsWrap="4"
+                app:flow_horizontalStyle="spread_inside"
+                app:flow_verticalGap="16dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/start_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="95dp"
+                android:layout_height="wrap_content"
+                android:text="Cek Aplikasi"
+                android:textColor="#334155"
+                android:textSize="12sp"
+                app:icon="@android:drawable/ic_media_play"
+                app:iconGravity="top"
+                app:iconSize="36dp"
+                app:iconTint="#10B981"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/scan_qr_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:text="Scan QR"
+                android:textColor="#334155"
+                android:textSize="12sp"
+                app:icon="@android:drawable/ic_menu_camera"
+                app:iconGravity="top"
+                app:iconSize="36dp"
+                app:iconTint="#3B82F6"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/retry_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:text="Jaringan"
+                android:textColor="#334155"
+                android:textSize="12sp"
+                app:icon="@android:drawable/ic_menu_preferences"
+                app:iconGravity="top"
+                app:iconSize="36dp"
+                app:iconTint="#F59E0B"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/exit_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:text="Keluar"
+                android:textColor="#EF4444"
+                android:textSize="12sp"
+                app:icon="@android:drawable/ic_lock_power_off"
+                app:iconGravity="top"
+                app:iconSize="36dp"
+                app:iconTint="#EF4444"
+                android:visibility="gone" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- ✅ FIX: Samakan ID menjadi loading_overlay sesuai Kotlin -->
+        <LinearLayout
+            android:id="@+id/loading_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            android:background="#E6FFFFFF"
+            android:elevation="10dp"
+            android:clickable="true"
+            android:focusable="true">
+            <ProgressBar android:layout_width="64dp" android:layout_height="64dp" android:indeterminateTint="#1E88E5" />
+            <TextView 
+                android:id="@+id/loading_text"
+                android:layout_width="wrap_content" 
+                android:layout_height="wrap_content" 
+                android:text="Memproses..." 
+                android:textColor="#1E293B" 
+                android:textStyle="bold" 
+                android:layout_marginTop="20dp"/>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <RelativeLayout
+        android:id="@+id/scanner_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+        <androidx.camera.view.PreviewView android:id="@+id/preview_view" android:layout_width="match_parent" android:layout_height="match_parent" />
+        <FrameLayout android:id="@+id/viewfinder_container" android:layout_width="250dp" android:layout_height="250dp" android:layout_centerInParent="true">
+            <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/viewfinder" />
+            <View android:id="@+id/scanner_laser" android:layout_width="match_parent" android:layout_height="3dp" android:background="#10B981" />
+        </FrameLayout>
+
+        <ImageButton android:id="@+id/torch_button" android:layout_width="56dp" android:layout_height="56dp" android:layout_marginTop="32dp" android:layout_marginEnd="24dp" android:layout_alignParentTop="true" android:layout_alignParentEnd="true" android:background="@drawable/circular_bg" android:src="@drawable/ic_flashlight" app:tint="#FFFFFF" />
+
+        <ImageButton android:id="@+id/flip_camera_button" android:layout_width="56dp" android:layout_height="56dp" android:layout_marginTop="32dp" android:layout_marginStart="24dp" android:layout_alignParentTop="true" android:layout_alignParentStart="true" android:background="@drawable/circular_bg" android:src="@android:drawable/ic_menu_rotate" app:tint="#FFFFFF" />
+
+        <Button android:id="@+id/cancel_scan_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="48dp" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true" android:text="Batal" android:backgroundTint="#EF4444" />
+    </RelativeLayout>
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#FFFFFF"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/drawer_menu" />
+
+
+</androidx.drawerlayout.widget.DrawerLayout>

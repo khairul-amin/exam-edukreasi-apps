@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Ujian</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">A</div>
+            <div class="user-details">
+                <h1 id="userName">Nama Siswa</h1>
+                <p id="userEmail">email@siswa.com</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="exam-grid" id="examGrid"></div>
+
+    <!-- Kotak Info Dinamis (untuk pesan error/info) -->
+    <div class="info-box" id="infoBox" style="display: none;">
+        <div class="info-icon">ℹ️</div>
+        <h3 id="infoTitle">Judul Informasi</h3>
+        <p id="infoMessage">Pesan informasi akan muncul di sini.</p>
+    </div>
+
+    <div class="no-exams" id="noExams" style="display: none;">
+        <div class="no-exams-icon">📚</div>
+        <h3>Tidak Ada Ujian Aktif</h3>
+        <p>Saat ini tidak ada ujian yang tersedia untuk kelas Anda.</p>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
