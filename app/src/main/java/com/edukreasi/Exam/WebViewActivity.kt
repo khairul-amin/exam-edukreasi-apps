@@ -669,6 +669,7 @@ class WebViewActivity : AppCompatActivity() {
         }
     }
 
+
     private fun showExitAppConfirmation(isOfflineExam: Boolean) {
         val message = if (isOfflineExam) {
             "Yakin ingin keluar?\n\nJika ujian sedang berlangsung, status ujian akan TERKUNCI."

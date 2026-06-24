@@ -8,7 +8,7 @@
     android:background="@color/navy"
     android:fitsSystemWindows="true">
 
-    <!-- Header Responsif - SAMA DENGAN WebViewActivity -->
+    <!-- Header Responsif -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
@@ -174,12 +174,13 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- INFO SINKRONISASI -->
+                <!-- Status Pengiriman (Mini) -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/sync_status_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="16dp"
                     android:visibility="gone"
                     app:cardCornerRadius="12dp"
                     app:cardBackgroundColor="#FFF7ED"
@@ -199,7 +200,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:text="Mengirim 3 data ke server..."
+                            android:text="Mengirim data..."
                             android:textColor="#9A3412"
                             android:textSize="12sp"
                             android:textStyle="bold"/>
@@ -211,7 +212,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="16dp"
                     android:paddingTop="8dp"
-                    android:paddingBottom="16dp">
+                    android:paddingBottom="8dp">
 
                     <TextView
                         android:id="@+id/tv_section_title"
@@ -222,9 +223,23 @@
                         android:textSize="16sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
 
-
+                    <!-- Tombol Riwayat / Sinkron -->
+                    <TextView
+                        android:id="@+id/tv_btn_sync_center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Riwayat / Sinkron"
+                        android:textColor="#1E88E5"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"
+                        android:background="?attr/selectableItemBackground"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -247,18 +262,5 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <!-- FAB Sync Manual-->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fab_sync"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:text="Sinkron Ulang"
-        android:textColor="#FFFFFF"
-        app:backgroundTint="#10B981"
-        app:icon="@android:drawable/stat_notify_sync"
-        app:iconTint="#FFFFFF" />
 
 </LinearLayout>
