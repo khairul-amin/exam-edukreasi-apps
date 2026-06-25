@@ -8,6 +8,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,8 +41,11 @@ class SyncActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        CacheManager.init(this) // Pastikan CacheManager di-init!
+        CacheManager.init(this)
+        
+        setupDisplayEnvironment()
         setContentView(R.layout.activity_sync_history)
+        hideNavigationBar()
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -61,24 +67,36 @@ class SyncActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupDisplayEnvironment() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+    }
+
+    private fun hideNavigationBar() {
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        controller?.hide(WindowInsetsCompat.Type.navigationBars())
+        controller?.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideNavigationBar()
+    }
+
     private fun setupRecyclerView() {
         syncAdapter = SyncAdapter()
         rvHistory.layoutManager = LinearLayoutManager(this)
         rvHistory.adapter = syncAdapter
     }
 
-    // Di dalam SyncActivity.kt, perbarui fungsi loadLocalData()
     private fun loadLocalData() {
         lifecycleScope.launch {
             val subjects = withContext(Dispatchers.IO) { CacheManager.getSubjects() } ?: JSONArray()
             val pendingResults = withContext(Dispatchers.IO) { CacheManager.getResultsQueue() }
             val examsList = mutableListOf<JSONObject>()
 
-            // Ambil waktu sinkronisasi global terakhir
             val sharedPrefs = getSharedPreferences("exam_history_prefs", MODE_PRIVATE)
             val lastGlobalSync = sharedPrefs.getLong("history_sync_time", 0)
 
-            // Map untuk memudahkan cek antrean
             val pendingMap = mutableMapOf<String, JSONObject>()
             for (i in 0 until pendingResults.length()) {
                 val res = pendingResults.optJSONObject(i) ?: continue
@@ -98,29 +116,21 @@ class SyncActivity : AppCompatActivity() {
                 val answerProgress = CacheManager.getAnswerProgress(id)
                 val answeredCount = answerProgress?.length() ?: 0
 
-                // Flag status
                 subjectCopy.put("_is_server_synced", historyEntry != null)
                 subjectCopy.put("_has_local_history", localHistory != null)
                 subjectCopy.put("_is_pending_queue", inQueue != null || localStatus == "pending" || localStatus == "failed")
                 subjectCopy.put("_answered_count", answeredCount)
-
-                // --- TAMBAHKAN INI AGAR TIDAK MUNCUL "-" ---
                 subjectCopy.put("_last_sync_time", lastGlobalSync)
 
                 if (historyEntry != null) {
-                    // Gunakan timestamp dari server jika ada
                     subjectCopy.put("_submission_time", historyEntry.optLong("timestamp", 0))
                 } else if (localHistory != null) {
-                    // Gunakan timestamp lokal jika server belum ada
                     subjectCopy.put("_submission_time", localHistory.optLong("timestamp", 0))
                 }
-                // ------------------------------------------
 
                 examsList.add(subjectCopy)
             }
 
-
-            // Urutkan: yang ada aktivitasnya muncul di atas
             examsList.sortWith(compareByDescending<JSONObject> { it.optBoolean("_is_server_synced") }
                 .thenByDescending { it.optBoolean("_is_pending_queue") }
                 .thenByDescending { it.optBoolean("_has_local_history") }

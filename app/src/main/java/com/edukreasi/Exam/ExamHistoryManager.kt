@@ -60,7 +60,6 @@ class ExamHistoryManager(private val context: Context) {
                 }
             }
         } catch (e: Exception) {
-            // Jangan kembalikan cache jika terjadi error koneksi saat sinkronisasi manual
             return@withContext JSONObject().apply {
                 put("status", "error")
                 put("message", "Kesalahan koneksi: ${e.message}")
@@ -129,11 +128,14 @@ class ExamHistoryManager(private val context: Context) {
 
                     // PEMBERSIHAN TOTAL: Jika status lokal bukan 'none', reset ke awal
                     val localStatus = CacheManager.getSubmissionStatusString(subjectId)
-                    if (localStatus != "none") {
+                    val localHistory = CacheManager.getLocalHistory(subjectId)
+                    
+                    if (localStatus != "none" || localHistory != null) {
                         Log.d(TAG, "Cleaning up local data for $subjectId (deleted on server)")
                         CacheManager.saveSubmissionStatus(subjectId, "none", "")
-                       // CacheManager.deleteLocalResult(subjectId) // Hapus file skor lokal
-                        CacheManager.deleteAnswerProgress(subjectId) // Hapus progres jawaban
+                        CacheManager.deleteLocalHistory(subjectId) 
+                        CacheManager.deleteAnswerProgress(subjectId)
+                        CacheManager.setSessionLocked(subjectId, false)
                     }
                 }
             }

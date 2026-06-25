@@ -21,6 +21,8 @@ import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -48,7 +50,7 @@ class OfflineDashboardActivity : AppCompatActivity() {
     private lateinit var batteryIcon: ImageView
     private lateinit var logoutButton: ImageButton
     private lateinit var reloadButton: ImageButton
-    private lateinit var syncCenterButton: TextView // Diubah dari ImageButton
+    private lateinit var syncCenterButton: TextView 
     private lateinit var ivSyncIndicator: ImageView
 
     private val csvDataFetcher by lazy { CsvDataFetcher(this) }
@@ -58,8 +60,15 @@ class OfflineDashboardActivity : AppCompatActivity() {
     private val timeHandler = Handler(Looper.getMainLooper())
     private lateinit var batteryStatusReceiver: BroadcastReceiver
 
+    // UPDATE: Listener sekarang memantau last_cache_update agar sinkronisasi di SyncActivity langsung berefek di sini
     private val submissionListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        if (key != null && (key.startsWith("submission_status_") || key.startsWith("answer_progress_") || key.startsWith("locked_"))) {
+        if (key != null && (
+            key.startsWith("submission_status_") || 
+            key.startsWith("answer_progress_") || 
+            key.startsWith("locked_") ||
+            key == "last_cache_update" ||
+            key == "subjects_sync_time"
+        )) {
             runOnUiThread { loadExamsFromCache() }
         }
     }
@@ -75,7 +84,10 @@ class OfflineDashboardActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             window.setHideOverlayWindows(true)
         }
+        
+        setupDisplayEnvironment()
         setContentView(R.layout.activity_offline_dashboard)
+        hideNavigationBar()
         
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -84,7 +96,6 @@ class OfflineDashboardActivity : AppCompatActivity() {
         })
 
         CacheManager.init(this)
-        setupDisplayEnvironment()
 
         // Inisialisasi View
         timeTextView = findViewById(R.id.time_text)
@@ -92,7 +103,7 @@ class OfflineDashboardActivity : AppCompatActivity() {
         batteryIcon = findViewById(R.id.battery)
         logoutButton = findViewById(R.id.logout_button)
         reloadButton = findViewById(R.id.reload_button)
-        syncCenterButton = findViewById(R.id.tv_btn_sync_center) // Merujuk ke ID TextView baru
+        syncCenterButton = findViewById(R.id.tv_btn_sync_center)
         ivSyncIndicator = findViewById(R.id.iv_sync_indicator)
         tvStudentName = findViewById(R.id.tv_student_name)
         tvStudentInfo = findViewById(R.id.tv_student_info)
@@ -101,7 +112,6 @@ class OfflineDashboardActivity : AppCompatActivity() {
         syncStatusCard = findViewById(R.id.sync_status_card)
         tvSyncStatus = findViewById(R.id.tv_sync_status)
 
-        // Tombol ke Pusat Sinkronisasi
         syncCenterButton.setOnClickListener {
             startActivity(Intent(this, SyncActivity::class.java))
         }
@@ -202,8 +212,6 @@ class OfflineDashboardActivity : AppCompatActivity() {
             if (pendingResults.length() > 0) {
                 syncStatusCard.visibility = View.VISIBLE
                 tvSyncStatus.text = "${pendingResults.length()} jawaban belum terkirim. Klik Riwayat untuk sinkron."
-                
-                // Tambahkan klik pada card status juga agar mudah
                 syncStatusCard.setOnClickListener {
                     startActivity(Intent(this@OfflineDashboardActivity, SyncActivity::class.java))
                 }
@@ -276,6 +284,12 @@ class OfflineDashboardActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
+    private fun hideNavigationBar() {
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        controller.hide(WindowInsetsCompat.Type.navigationBars())
+        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
+
     private fun setupNetworkMonitoring() {
         val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val request = NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build()
@@ -327,6 +341,7 @@ class OfflineDashboardActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        hideNavigationBar()
         registerReceiver(batteryStatusReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         CacheManager.getPrefs().registerOnSharedPreferenceChangeListener(submissionListener)
         loadExamsFromCache()

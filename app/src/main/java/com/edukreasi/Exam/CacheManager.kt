@@ -42,6 +42,11 @@ object CacheManager {
         return sharedPrefs!!
     }
 
+    fun notifyDataChanged() {
+        ensureInit()
+        sharedPrefs!!.edit().putLong("last_cache_update", System.currentTimeMillis()).apply()
+    }
+
     // ==================== AUTH & STUDENT INFO ====================
 
     fun saveToken(token: String) {
@@ -61,6 +66,7 @@ object CacheManager {
             put("schoolName", schoolName); put("savedAt", System.currentTimeMillis())
         }
         sharedPrefs!!.edit().putString("student_info", json.toString()).apply()
+        notifyDataChanged()
     }
 
     fun getStudentInfo(): JSONObject? {
@@ -76,6 +82,7 @@ object CacheManager {
         val file = File(cacheDir!!, "subjects_cache.json")
         file.writeText(subjects.toString())
         sharedPrefs!!.edit().putLong("subjects_sync_time", System.currentTimeMillis()).apply()
+        notifyDataChanged()
     }
 
     fun getSubjects(): JSONArray? {
@@ -90,6 +97,7 @@ object CacheManager {
         ensureInit()
         val file = File(cacheDir!!, "answers_$examId.json")
         file.writeText(answers.toString())
+        notifyDataChanged()
     }
 
     fun getAnswerProgress(examId: String): JSONArray? {
@@ -104,6 +112,7 @@ object CacheManager {
         ensureInit()
         File(cacheDir!!, "answers_$examId.json").delete()
         sharedPrefs?.edit()?.remove("timer_$examId")?.remove("duration_$examId")?.apply()
+        notifyDataChanged()
     }
 
     fun saveSubmissionStatus(examId: String, status: String, message: String = "") {
@@ -112,6 +121,7 @@ object CacheManager {
             put("examId", examId); put("status", status); put("message", message); put("lastAttempt", System.currentTimeMillis())
         }
         sharedPrefs!!.edit().putString("submission_status_$examId", submission.toString()).apply()
+        notifyDataChanged()
     }
 
     fun getSubmissionStatusString(examId: String): String {
@@ -125,6 +135,7 @@ object CacheManager {
     fun setSessionLocked(examId: String, locked: Boolean) {
         ensureInit()
         sharedPrefs!!.edit().putBoolean("locked_$examId", locked).apply()
+        notifyDataChanged()
     }
 
     fun isSessionLocked(examId: String): Boolean {
@@ -132,10 +143,10 @@ object CacheManager {
         return sharedPrefs!!.getBoolean("locked_$examId", false)
     }
 
-    // Fungsi baru untuk melacak token mana yang sedang aktif dipakai di ujian ini
     fun setActiveToken(examId: String, token: String) {
         ensureInit()
         sharedPrefs!!.edit().putString("active_token_$examId", token).apply()
+        notifyDataChanged()
     }
 
     fun getActiveToken(examId: String): String? {
@@ -143,7 +154,6 @@ object CacheManager {
         return sharedPrefs!!.getString("active_token_$examId", null)
     }
 
-    // Fungsi baru untuk mencatat attempt sesuai instruksi server
     fun saveExamAttempt(examId: String, token: String, exitReason: String) {
         ensureInit()
         val attemptsJson = sharedPrefs!!.getString("attempts_$examId", "[]")
@@ -159,6 +169,7 @@ object CacheManager {
 
         attemptsArray.put(newAttempt)
         sharedPrefs!!.edit().putString("attempts_$examId", attemptsArray.toString()).apply()
+        notifyDataChanged()
     }
 
     fun getUsedProctorTokens(): Set<String> {
@@ -171,6 +182,7 @@ object CacheManager {
         val used = getUsedProctorTokens().toMutableSet()
         used.add(token)
         sharedPrefs!!.edit().putStringSet("used_proctor_tokens", used).apply()
+        notifyDataChanged()
     }
 
     fun queuePendingUnlock(unlockData: JSONObject) {
@@ -181,6 +193,7 @@ object CacheManager {
         } else JSONArray()
         queue.put(unlockData)
         file.writeText(queue.toString())
+        notifyDataChanged()
     }
 
     fun getPendingUnlocks(): JSONArray {
@@ -205,6 +218,7 @@ object CacheManager {
                 }
             }
             file.writeText(newQueue.toString())
+            notifyDataChanged()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -233,6 +247,7 @@ object CacheManager {
 
         queue.put(result)
         file.writeText(queue.toString())
+        notifyDataChanged()
     }
 
     fun getResultsQueue(): JSONArray {
@@ -258,6 +273,7 @@ object CacheManager {
                 }
             }
             file.writeText(newQueue.toString())
+            notifyDataChanged()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -282,6 +298,7 @@ object CacheManager {
         }
 
         sharedPrefs!!.edit().putString("sync_history", newArray.toString()).apply()
+        notifyDataChanged()
     }
 
     fun saveTimeLeft(examId: String, seconds: Int, totalDurationMinutes: Int) {
@@ -300,6 +317,7 @@ object CacheManager {
         ensureInit()
         sharedPrefs!!.edit().clear().apply()
         cacheDir?.listFiles()?.forEach { it.delete() }
+        notifyDataChanged()
     }
 
     // ==================== API PROCTOR TOKENS ====================
@@ -307,6 +325,7 @@ object CacheManager {
     fun saveAvailableProctorTokens(tokensArray: JSONArray) {
         ensureInit()
         sharedPrefs!!.edit().putString("api_proctor_tokens", tokensArray.toString()).apply()
+        notifyDataChanged()
     }
 
     fun getAvailableProctorTokens(): List<String> {
@@ -328,12 +347,19 @@ object CacheManager {
     fun saveLocalHistory(examId: String, result: JSONObject) {
         ensureInit()
         sharedPrefs!!.edit().putString("local_history_$examId", result.toString()).apply()
+        notifyDataChanged()
     }
 
     fun getLocalHistory(examId: String): JSONObject? {
         ensureInit()
         val data = sharedPrefs!!.getString("local_history_$examId", null)
         return if (data != null) JSONObject(data) else null
+    }
+
+    fun deleteLocalHistory(examId: String) {
+        ensureInit()
+        sharedPrefs!!.edit().remove("local_history_$examId").apply()
+        notifyDataChanged()
     }
 
 }
