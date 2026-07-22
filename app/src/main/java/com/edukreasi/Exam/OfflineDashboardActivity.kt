@@ -20,6 +20,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -60,7 +61,6 @@ class OfflineDashboardActivity : AppCompatActivity() {
     private val timeHandler = Handler(Looper.getMainLooper())
     private lateinit var batteryStatusReceiver: BroadcastReceiver
 
-    // UPDATE: Listener sekarang memantau last_cache_update agar sinkronisasi di SyncActivity langsung berefek di sini
     private val submissionListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key != null && (
             key.startsWith("submission_status_") || 
@@ -87,6 +87,16 @@ class OfflineDashboardActivity : AppCompatActivity() {
         
         setupDisplayEnvironment()
         setContentView(R.layout.activity_offline_dashboard)
+        
+        val header = findViewById<View>(R.id.header_layout)
+        header?.let {
+            ViewCompat.setOnApplyWindowInsetsListener(it) { view, insets ->
+                val statusBar = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+                view.setPadding(view.paddingLeft, statusBar.top, view.paddingRight, view.paddingBottom)
+                insets
+            }
+        }
+
         hideNavigationBar()
         
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
@@ -97,7 +107,6 @@ class OfflineDashboardActivity : AppCompatActivity() {
 
         CacheManager.init(this)
 
-        // Inisialisasi View
         timeTextView = findViewById(R.id.time_text)
         batteryTextView = findViewById(R.id.battery_text)
         batteryIcon = findViewById(R.id.battery)
@@ -221,14 +230,18 @@ class OfflineDashboardActivity : AppCompatActivity() {
 
             for (i in 0 until subjects.length()) {
                 val subject = subjects.optJSONObject(i) ?: continue
+                val id = subject.optString("id")
                 var examDate = subject.optString("examDate", "")
                 if (examDate.isEmpty()) examDate = subject.optJSONObject("data")?.optString("examDate", "") ?: ""
 
-                if (examDate == todayDate) {
-                    val id = subject.optString("id")
-                    val localStatus = CacheManager.getSubmissionStatusString(id)
-                    val isLocked = CacheManager.isSessionLocked(id)
+                val localStatus = CacheManager.getSubmissionStatusString(id)
+                val isLocked = CacheManager.isSessionLocked(id)
+                val hasProgress = withContext(Dispatchers.IO) { CacheManager.getAnswerProgress(id) != null }
 
+                // Perbaikan: Ujian tetap muncul jika Hari Ini ATAU ada progres jawaban ATAU belum terkirim sukses
+                val shouldShow = examDate == todayDate || hasProgress || localStatus == "pending" || localStatus == "failed"
+
+                if (shouldShow) {
                     val subjectCopy = JSONObject(subject.toString())
                     subjectCopy.put("_sync_status", localStatus)
                     subjectCopy.put("_last_sync_time", lastSyncTime)
@@ -282,6 +295,10 @@ class OfflineDashboardActivity : AppCompatActivity() {
     private fun setupDisplayEnvironment() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
     }
 
     private fun hideNavigationBar() {

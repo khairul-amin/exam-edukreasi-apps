@@ -1,8 +1,10 @@
 package com.edukreasi.Exam
 
+import androidx.core.view.ViewCompat
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -45,12 +47,26 @@ class SyncActivity : AppCompatActivity() {
         
         setupDisplayEnvironment()
         setContentView(R.layout.activity_sync_history)
-        hideNavigationBar()
+        
+        // Perbaikan: Gunakan AppBarLayout untuk menangani Insets agar Toolbar tidak terpotong
+        val appBar = findViewById<View>(R.id.app_bar)
+        appBar?.let {
+            ViewCompat.setOnApplyWindowInsetsListener(it) { view, insets ->
+                val statusBar = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+                // Gunakan padding agar Toolbar turun ke bawah Status Bar
+                view.setPadding(0, statusBar.top, 0, 0)
+                insets
+            }
+            // Paksa sistem untuk mengirim ulang insets
+            it.requestApplyInsets()
+        }
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { finish() }
+
+        hideNavigationBar()
 
         rvHistory = findViewById(R.id.rv_history)
         tvEmptyHistory = findViewById(R.id.tv_empty_history)
@@ -68,11 +84,20 @@ class SyncActivity : AppCompatActivity() {
     }
 
     private fun setupDisplayEnvironment() {
+        // Matikan fit system windows otomatis agar kita bisa kontrol manual
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        
+        // Buat Status Bar transparan agar warna Navy AppBarLayout terlihat
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
     }
 
     private fun hideNavigationBar() {
         val controller = WindowCompat.getInsetsController(window, window.decorView)
+        // Hanya sembunyikan Navigation Bar, biarkan Status Bar tetap muncul
         controller?.hide(WindowInsetsCompat.Type.navigationBars())
         controller?.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
@@ -131,6 +156,7 @@ class SyncActivity : AppCompatActivity() {
                 examsList.add(subjectCopy)
             }
 
+            // Sort: Pending -> Local History -> Answered -> Rest
             examsList.sortWith(compareByDescending<JSONObject> { it.optBoolean("_is_server_synced") }
                 .thenByDescending { it.optBoolean("_is_pending_queue") }
                 .thenByDescending { it.optBoolean("_has_local_history") }
