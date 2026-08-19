@@ -644,13 +644,41 @@ class WaitingScreenActivity : AppCompatActivity() {
                         csvDataFetcher.savePubUrl(json.getString("link"))
                         csvDataFetcher.saveNpsn(json.getString("npsn"))
 
-                        val tokenData: TokenResponse? = csvDataFetcher.getToken()
-                        if (tokenData != null) csvDataFetcher.saveSchoolName(tokenData.sekolah)
+                        // Optimasi: Berikan respon sukses instan ke user tanpa menunggu fetch data berat
+                        withContext(Dispatchers.Main) { 
+                            hideLoading()
+                            updateUIState() 
+                        }
 
+                        // Lakukan sinkronisasi token dan caching CSV di latar belakang
                         preFetchData()
-                        withContext(Dispatchers.Main) { hideLoading(); updateUIState() }
+
+                    } else if (response.code == 403) {
+                        // ✅ TANGKAP ERROR 403 (TRIAL HABIS / LISENSI NONAKTIF)
+                        val errorBody = response.body?.string() ?: ""
+                        var pesanPeringatan = "Akses Ditolak."
+
+                        try {
+                            val jsonError = JSONObject(errorBody)
+                            if (jsonError.has("message")) {
+                                pesanPeringatan = jsonError.getString("message")
+                            }
+                        } catch (e: Exception) {
+                            Log.e("ActivationError", "Gagal parse JSON error", e)
+                        }
+
+                        withContext(Dispatchers.Main) {
+                            hideLoading()
+                            // Gunakan showErrorDialog yang sudah ada di Activity Anda
+                            showErrorDialog("Lisensi Terbatas", pesanPeringatan)
+                        }
+
                     } else {
-                        withContext(Dispatchers.Main) { hideLoading(); showErrorDialog("QR Tidak Valid", "Silakan gunakan QR Code resmi dari sekolah.") }
+                        // ERROR LAIN (404, 500, dsb)
+                        withContext(Dispatchers.Main) {
+                            hideLoading()
+                            showErrorDialog("QR Tidak Valid", "Silakan gunakan QR Code resmi dari sekolah.")
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -802,19 +830,16 @@ class WaitingScreenActivity : AppCompatActivity() {
                         }
 
                         withContext(Dispatchers.Main) {
-                            hideLoading()
                             updateUIState()
                         }
                     } else {
                         withContext(Dispatchers.Main) {
-                            hideLoading()
                             updateUIState()
                         }
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    hideLoading()
                     updateUIState()
                 }
             }
